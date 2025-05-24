@@ -1,0 +1,9 @@
+mcp
+httpx
+backoff
+python-dotenv
+requests
+pandas
+databricks-sdk
+uvicorn
+

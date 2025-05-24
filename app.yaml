@@ -1,0 +1,7 @@
+command:
+- "python"
+- "mcp_server.py"
+
+env:
+- name: "SPACE_ID"
+  value: "01f02a31663e19b0a18f1a2ed7a435a7"
