@@ -51,6 +51,7 @@ You can deploy the Genie MCP Server as a Databricks app by following these steps
    - Go to the Databricks Apps interface.
    - Create a new app and specify the path to the directory where you cloned the repository.
    - Complete the app creation and deployment process.
+   ```databricks apps deploy genie-mcp-server --source-code-path /Workspace/Users/your.email@databricks.com/genie_mcp_server```
 
 4. **Access the API**
 
