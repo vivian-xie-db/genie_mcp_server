@@ -21,12 +21,12 @@ logger = logging.getLogger("genie-mcp-server")
 app = Server("genie-mcp-server")
 
 @app.call_tool()
-async def call_tool(name: str, message: dict) -> list[types.TextContent]:
+async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     """Handle genie tool call."""
     ctx = app.request_context
-    query = message.get("query")
+    query = arguments.get("query")
     if not query:
-        raise ValueError("'query' is required in message")
+        raise ValueError("'query' is required in arguments")
 
     # Stream a log message
     await ctx.session.send_log_message(
@@ -69,14 +69,14 @@ async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="genie-query",
-            description="Query the genie room to get an answer to the user's question",
+            description="Query the genie room to get an answer to supply chain and distribution questions",
             inputSchema={
                 "type": "object",
                 "required": ["query"],
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "Query",
+                        "description": "Query to be answered by the genie room",
                     }
                 },
             },
