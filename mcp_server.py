@@ -101,7 +101,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     return [
         types.TextContent(type="text", text=response),
     ]
-app = Server("example-server")
+app = Server("genie-mcp-server")
 
 @app.list_resources()
 async def list_resources() -> list[types.Resource]:
