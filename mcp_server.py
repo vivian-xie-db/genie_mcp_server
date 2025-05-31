@@ -12,13 +12,52 @@ from genie_room import genie_query
 import uvicorn
 from dotenv import load_dotenv
 import os
-
+import glob
+import json
+from pydantic import AnyUrl
+from pathlib import Path
 load_dotenv()
-DATABRICKS_APP_PORT = os.getenv("DATABRICKS_APP_PORT")
+
+DATABRICKS_APP_PORT = os.getenv("DATABRICKS_APP_PORT",8000)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("genie-mcp-server")
 
 app = Server("genie-mcp-server")
+
+AGENT_CARDS_DIR = "agent_cards"
+
+def load_agent_cards():
+    """Loads agent card data from JSON files within a specified directory."""
+    card_uris = []
+    agent_cards = {}
+    dir_path = Path(AGENT_CARDS_DIR)
+    if not dir_path.is_dir():
+        logger.error(f'Agent cards directory not found or is not a directory: {AGENT_CARDS_DIR}')
+        return card_uris, agent_cards
+    logger.info(f'Loading agent cards from card repo: {AGENT_CARDS_DIR}')
+    for filename in os.listdir(AGENT_CARDS_DIR):
+        if filename.lower().endswith('.json'):
+            file_path = dir_path / filename
+            card_name = Path(filename).stem
+            uri = f'resource://agent_cards/{card_name}'
+            if file_path.is_file():
+                logger.info(f'Reading file: {filename}')
+                try:
+                    with file_path.open('r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        card_uris.append(uri)
+                        agent_cards[uri] = data
+                except json.JSONDecodeError as jde:
+                    logger.error(f'JSON Decoder Error {jde}')
+                except OSError as e:
+                    logger.error(f'Error reading file {filename}: {e}.')
+                except Exception as e:
+                    logger.error(f'An unexpected error occurred processing {filename}: {e}', exc_info=True)
+    logger.info(f'Finished loading agent cards. Found {len(agent_cards)} cards.')
+    return card_uris, agent_cards
+
+# Preload agent cards at module load
+tag_card_uris, AGENT_CARD_RESOURCES = load_agent_cards()
 
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
@@ -62,6 +101,31 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     return [
         types.TextContent(type="text", text=response),
     ]
+app = Server("example-server")
+
+@app.list_resources()
+async def list_resources() -> list[types.Resource]:
+    resources = []
+    # Individual card endpoints
+    for uri in tag_card_uris:
+        card = AGENT_CARD_RESOURCES.get(uri, {})
+        name = card.get("name", uri)
+        resources.append(
+            types.Resource(
+                uri=uri,
+                name=name,
+                mimeType="application/json"
+            )
+        )
+    return resources
+
+@app.read_resource()
+async def read_resource(uri: AnyUrl) -> str:
+    uri_str = str(uri)
+    if uri_str in AGENT_CARD_RESOURCES:
+        return json.dumps(AGENT_CARD_RESOURCES[uri_str], indent=2)
+    raise ValueError("Resource not found")
+
 
 @app.list_tools()
 async def list_tools() -> list[types.Tool]:
@@ -110,7 +174,7 @@ starlette_app = Starlette(
 
 
 if __name__ == "__main__":
-    uvicorn.run(starlette_app, host="0.0.0.0", port=DATABRICKS_APP_PORT)
+    uvicorn.run(starlette_app, port=DATABRICKS_APP_PORT)
 
 
 

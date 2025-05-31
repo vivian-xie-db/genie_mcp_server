@@ -1,0 +1,48 @@
+{
+    "name": "Genie supply chain Agent",
+    "description": "Helps with supply chain and distribution questions",
+    "url": "http://localhost:10103/",
+    "provider": null,
+    "version": "1.0.0",
+    "documentationUrl": null,
+    "capabilities": {
+        "streaming": "True",
+        "pushNotifications": "True",
+        "stateTransitionHistory": "False"
+    },
+    "authentication": {
+        "credentials": null,
+        "schemes": [
+            "public"
+        ]
+    },
+    "defaultInputModes": [
+        "text",
+        "text/plain"
+    ],
+    "defaultOutputModes": [
+        "text",
+        "text/plain"
+    ],
+    "skills": [
+        {
+            "id": "supply_chain_and_distribution",
+            "name": "Supply Chain and Distribution",
+            "description": "Helps with supply chain and distribution questions",
+            "tags": [
+                "Supply chain",
+                "Distribution",
+                "Logistics",
+                "Transportation",
+                "Warehousing",
+                "Inventory Management",
+                "Supply Chain Management"
+            ],
+            "examples": [
+                "List top 3 distubution centers"
+            ],
+            "inputModes": null,
+            "outputModes": null
+        }
+    ]
+}

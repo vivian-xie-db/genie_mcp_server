@@ -1,0 +1,24 @@
+bundle:
+  name: mcp-bundle
+
+resources:
+  apps:
+    mcp_app:
+      name: 'mcp-app'
+      source_code_path: . # This assumes the app source code is at the root of the project.
+      description: 'A Databricks app'
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com
+  prod:
+    mode: production
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
