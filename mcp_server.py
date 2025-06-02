@@ -12,7 +12,6 @@ from genie_room import genie_query
 import uvicorn
 from dotenv import load_dotenv
 import os
-import glob
 import json
 from pydantic import AnyUrl
 from pathlib import Path
@@ -101,7 +100,6 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     return [
         types.TextContent(type="text", text=response),
     ]
-app = Server("genie-mcp-server")
 
 @app.list_resources()
 async def list_resources() -> list[types.Resource]:
